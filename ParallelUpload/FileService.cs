@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ParallelUpload
@@ -31,6 +32,7 @@ namespace ParallelUpload
             try
             {
                 File.Copy(source, target);
+                Thread.Sleep(3000);
 
                 return true;
             }
