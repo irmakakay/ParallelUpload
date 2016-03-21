@@ -14,20 +14,24 @@ namespace ParallelUpload
 
     public class FileServiceProxy : IFileServiceProxy
     {
+        private readonly IFileService _fileService;
+
         private readonly string _targetDir;
 
         private HashSet<string> _existingFiles; 
 
-        public FileServiceProxy(string targetDir)
+        public FileServiceProxy(IFileService fileService, string targetDir)
         {
+            _fileService = fileService;
             _targetDir = targetDir;
         }
-
 
         #region Implementation of IFileServiceProxy
 
         public void UploadFiles(IEnumerable<string> files)
         {
+            
+
             throw new NotImplementedException();
         }
 

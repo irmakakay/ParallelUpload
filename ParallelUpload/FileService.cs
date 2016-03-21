@@ -31,8 +31,10 @@ namespace ParallelUpload
         {
             try
             {
-                File.Copy(source, target);
-                Thread.Sleep(3000);
+                var file = new FileInfo(source);
+                file.CopyTo(Path.Combine(target, file.Name));
+                
+                Thread.Sleep(1000);
 
                 return true;
             }
