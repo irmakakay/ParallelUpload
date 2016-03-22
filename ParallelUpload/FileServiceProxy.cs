@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace ParallelUpload
 {
     public interface IFileServiceProxy
     {
+        void SubscibeOn(ConcurrentQueue<string> messages);
+
         void UploadFiles(IEnumerable<string> files);
     }
 
@@ -18,7 +21,9 @@ namespace ParallelUpload
 
         private readonly string _targetDir;
 
-        private HashSet<string> _existingFiles; 
+        private HashSet<string> _existingFiles;
+
+        private ConcurrentQueue<string> _messages; 
 
         public FileServiceProxy(IFileService fileService, string targetDir)
         {
@@ -27,6 +32,11 @@ namespace ParallelUpload
         }
 
         #region Implementation of IFileServiceProxy
+
+        public void SubscibeOn(ConcurrentQueue<string> messages)
+        {
+            _messages = messages;
+        }
 
         public void UploadFiles(IEnumerable<string> files)
         {
