@@ -40,9 +40,18 @@ namespace ParallelUpload
 
         public void UploadFiles(IEnumerable<string> files)
         {
-            
+            ForEachAsync(files, 
+                Environment.ProcessorCount, 
+                f => _fileService.UploadAsync(f, _targetDir))
+                .Wait();
 
-            throw new NotImplementedException();
+            //var options = new ParallelOptions {MaxDegreeOfParallelism = Environment.ProcessorCount};
+
+            //var result = Parallel.ForEach(files, options, file =>
+            //{
+            //    _fileService.Upload(file, _targetDir);
+            //    _messages.Enqueue(string.Format("{0} copied under {1}", file, _targetDir));
+            //});                      
         }
 
         #endregion
@@ -51,6 +60,21 @@ namespace ParallelUpload
         {
             get { return _existingFiles ?? 
                 (_existingFiles = new HashSet<string>(Directory.GetFiles(_targetDir))); }
+        }
+
+        public Task ForEachAsync<T>(IEnumerable<T> source, int dop, Func<T, Task> body)
+        {
+            return Task.WhenAll(
+                from partition in Partitioner.Create(source).GetPartitions(dop)
+                select Task.Run(async delegate
+                {
+                    using (partition)
+                        while (partition.MoveNext())
+                        {
+                            await body(partition.Current);
+                            _messages.Enqueue(string.Format("{0} copied under {1}", partition.Current, _targetDir));
+                        }
+                }));
         }
     }
 }

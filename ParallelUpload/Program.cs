@@ -14,7 +14,14 @@ namespace ParallelUpload
 
         static void Main(string[] args)
         {
-            GenerateFiles();
+            //GenerateFiles();
+
+            var task = new UploadTask(
+                SourceDir, 
+                new FileServiceProxy(new FileService(), TargetDir), 
+                new LoggingClient(new Logger()));
+
+            task.Run();
         }
 
         private static void GenerateFiles()

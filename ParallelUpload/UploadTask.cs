@@ -34,7 +34,7 @@ namespace ParallelUpload
         {           
             var files = Directory.GetFiles(_sourceDir);
 
-            
+            _fileService.UploadFiles(files);
         }
     }
 }
