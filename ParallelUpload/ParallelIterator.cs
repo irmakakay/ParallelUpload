@@ -15,7 +15,7 @@ namespace ParallelUpload
             _formatter = formatter;
         }
 
-        #region Implementation of ITaskManager
+        #region Implementation of IParallelIterator
 
         public Task ForEachAsync<T>(
             BlockingCollection<string> messages,
