@@ -3,14 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ParallelUpload
 {
     public interface IFileServiceProxy
     {
-        void SubscibeOn(ConcurrentQueue<string> messages);
+        void SubscibeOn(BlockingCollection<string> messages);
 
         void UploadFiles(IEnumerable<string> files);
     }
@@ -21,37 +20,36 @@ namespace ParallelUpload
 
         private readonly string _targetDir;
 
+        private readonly IParallelIterator _iterator;
+
         private HashSet<string> _existingFiles;
 
-        private ConcurrentQueue<string> _messages; 
+        private BlockingCollection<string> _messages; 
 
-        public FileServiceProxy(IFileService fileService, string targetDir)
+        public FileServiceProxy(IFileService fileService, IParallelIterator iterator, string targetDir)
         {
             _fileService = fileService;
             _targetDir = targetDir;
+            _iterator = iterator;
         }
 
         #region Implementation of IFileServiceProxy
 
-        public void SubscibeOn(ConcurrentQueue<string> messages)
+        public void SubscibeOn(BlockingCollection<string> messages)
         {
             _messages = messages;
         }
 
         public void UploadFiles(IEnumerable<string> files)
         {
-            ForEachAsync(files, 
+            _iterator.ForEachAsync(
+                _messages, 
+                files, 
                 Environment.ProcessorCount, 
-                f => _fileService.UploadAsync(f, _targetDir))
-                .Wait();
-
-            //var options = new ParallelOptions {MaxDegreeOfParallelism = Environment.ProcessorCount};
-
-            //var result = Parallel.ForEach(files, options, file =>
-            //{
-            //    _fileService.Upload(file, _targetDir);
-            //    _messages.Enqueue(string.Format("{0} copied under {1}", file, _targetDir));
-            //});                      
+                f => _fileService.Upload(f, _targetDir))
+                .Wait();   
+            
+            _messages.CompleteAdding();
         }
 
         #endregion
@@ -60,21 +58,6 @@ namespace ParallelUpload
         {
             get { return _existingFiles ?? 
                 (_existingFiles = new HashSet<string>(Directory.GetFiles(_targetDir))); }
-        }
-
-        public Task ForEachAsync<T>(IEnumerable<T> source, int dop, Func<T, Task> body)
-        {
-            return Task.WhenAll(
-                from partition in Partitioner.Create(source).GetPartitions(dop)
-                select Task.Run(async delegate
-                {
-                    using (partition)
-                        while (partition.MoveNext())
-                        {
-                            await body(partition.Current);
-                            _messages.Enqueue(string.Format("{0} copied under {1}", partition.Current, _targetDir));
-                        }
-                }));
         }
     }
 }

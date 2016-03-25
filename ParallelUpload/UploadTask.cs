@@ -13,13 +13,14 @@ namespace ParallelUpload
         private readonly string _sourceDir;        
         private readonly IFileServiceProxy _fileService;
         private readonly ILoggingClient _logger;
-        private readonly ConcurrentQueue<string> _messages = new ConcurrentQueue<string>(); 
+        
+        private readonly BlockingCollection<string> _messages = new BlockingCollection<string>(); 
 
         public UploadTask(string sourceDir, IFileServiceProxy fileService, ILoggingClient logger)
         {
             _sourceDir = sourceDir;            
             _fileService = fileService;
-            _logger = logger;
+            _logger = logger;            
 
             InitMessages();
         }
@@ -32,9 +33,12 @@ namespace ParallelUpload
 
         public void Run()
         {           
-            var files = Directory.GetFiles(_sourceDir);
+            var files = Directory.GetFiles(_sourceDir);            
 
-            _fileService.UploadFiles(files);
-        }
+            var upload = Task.Factory.StartNew(() => _fileService.UploadFiles(files));
+            var log = Task.Factory.StartNew(() => _logger.TryLog());
+
+            Task.WaitAll(upload, log);
+        }      
     }
 }

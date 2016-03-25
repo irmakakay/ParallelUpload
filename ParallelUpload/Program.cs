@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
+using Timer = System.Timers.Timer;
 
 namespace ParallelUpload
 {
@@ -14,14 +17,20 @@ namespace ParallelUpload
 
         static void Main(string[] args)
         {
-            //GenerateFiles();
+            //GenerateFiles();            
 
             var task = new UploadTask(
                 SourceDir, 
-                new FileServiceProxy(new FileService(), TargetDir), 
+                new FileServiceProxy(new FileService(), new ParallelIterator(new DefaultMessageFormatter()), TargetDir), 
                 new LoggingClient(new Logger()));
 
+            var sw = Stopwatch.StartNew();
+
             task.Run();
+
+            sw.Stop();
+
+            Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         private static void GenerateFiles()

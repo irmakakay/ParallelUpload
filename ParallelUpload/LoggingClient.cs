@@ -1,14 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Concurrent;
 
 namespace ParallelUpload
 {
     public interface ILoggingClient
     {
-        void SubscribeOn(ConcurrentQueue<string> messages);
+        void SubscribeOn(BlockingCollection<string> messages);
 
         void TryLog();
     }
@@ -17,25 +14,28 @@ namespace ParallelUpload
     {
         private readonly ILogger _logger;
 
-        private ConcurrentQueue<string> _messages;
+        private BlockingCollection<string> _messages;
 
         public LoggingClient(ILogger logger)
         {
             _logger = logger;
         }
 
-        public void SubscribeOn(ConcurrentQueue<string> messages)
+        public void SubscribeOn(BlockingCollection<string> messages)
         {
             _messages = messages;
         }
 
         public void TryLog()
         {
-            string message;
-            if (_messages.TryDequeue(out message))
-            {
-                _logger.Debug(message);
+            try
+            {                
+                while (true) _logger.Debug(_messages.Take());
             }
+            catch (InvalidOperationException)
+            {                
+                _logger.Debug("Upload complete.");
+            }              
         }
     }
 }

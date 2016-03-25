@@ -41,11 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultMessageFormatter.cs" />
     <Compile Include="FileService.cs" />
     <Compile Include="FileServiceProxy.cs" />
     <Compile Include="ILogger.cs" />
+    <Compile Include="IMessageFormatter.cs" />
+    <Compile Include="IParallelIterator.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LoggingClient.cs" />
+    <Compile Include="ParallelIterator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UploadTask.cs" />

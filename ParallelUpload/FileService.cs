@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +31,7 @@ namespace ParallelUpload
                 var file = new FileInfo(source);
                 file.CopyTo(Path.Combine(target, file.Name));
                 
-                Thread.Sleep(100);
+                Thread.Sleep(200);
 
                 return true;
             }
