@@ -1,28 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Threading;
-using Timer = System.Timers.Timer;
+using System.Linq;
+using Microsoft.Practices.Unity;
 
 namespace ParallelUpload
-{
-    class Program
+{    
+    static class Program
     {
-        private const string SourceDir = @"D:\code\massive\ParallelUpload\Source";
-        private const string TargetDir = @"D:\code\massive\ParallelUpload\Target";
+        private static readonly IUnityContainer Container = new UnityContainer();
 
         static void Main(string[] args)
         {
             //GenerateFiles();            
 
-            var task = new UploadTask(
-                SourceDir, 
-                new FileServiceProxy(new FileService(), new ParallelIterator(new DefaultMessageFormatter()), TargetDir), 
-                new LoggingClient(new Logger()));
+            UploadBootstrapper.Configure(Container);
+
+            var task = Create<ITask>();
 
             var sw = Stopwatch.StartNew();
 
@@ -31,6 +25,11 @@ namespace ParallelUpload
             sw.Stop();
 
             Console.WriteLine(sw.ElapsedMilliseconds);
+        }
+
+        private static T Create<T>()
+        {
+            return Container.Resolve<T>();
         }
 
         private static void GenerateFiles()
@@ -43,7 +42,9 @@ namespace ParallelUpload
 
         private static void SaveFile(string fileName)
         {
-            using (var file = File.CreateText(Path.Combine(SourceDir, fileName + ".txt")))
+            var config = Create<IUploadConfiguration>();
+
+            using (var file = File.CreateText(Path.Combine(config.SourceDir, fileName + ".txt")))
             {
                 file.WriteLine(fileName);
             }

@@ -18,7 +18,7 @@ namespace ParallelUpload
     {
         private readonly IFileService _fileService;
 
-        private readonly string _targetDir;
+        private readonly IUploadConfiguration _configuration;
 
         private readonly IParallelIterator _iterator;
 
@@ -26,10 +26,10 @@ namespace ParallelUpload
 
         private BlockingCollection<string> _messages; 
 
-        public FileServiceProxy(IFileService fileService, IParallelIterator iterator, string targetDir)
+        public FileServiceProxy(IFileService fileService, IParallelIterator iterator, IUploadConfiguration configuration)
         {
             _fileService = fileService;
-            _targetDir = targetDir;
+            _configuration = configuration;
             _iterator = iterator;
         }
 
@@ -46,7 +46,7 @@ namespace ParallelUpload
                 _messages, 
                 files, 
                 Environment.ProcessorCount, 
-                f => _fileService.Upload(f, _targetDir))
+                f => _fileService.Upload(f, _configuration.TargetFir))
                 .Wait();   
             
             _messages.CompleteAdding();
@@ -57,7 +57,7 @@ namespace ParallelUpload
         private HashSet<string> ExistingFiles
         {
             get { return _existingFiles ?? 
-                (_existingFiles = new HashSet<string>(Directory.GetFiles(_targetDir))); }
+                (_existingFiles = new HashSet<string>(Directory.GetFiles(_configuration.TargetFir))); }
         }
     }
 }
