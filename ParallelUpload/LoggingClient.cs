@@ -5,7 +5,7 @@ namespace ParallelUpload
 {
     public interface ILoggingClient
     {
-        void SubscribeOn(BlockingCollection<string> messages);
+        void SubscribeOn(BlockingCollection<ILogMessage> messages);
 
         void TryLog();
     }
@@ -14,14 +14,14 @@ namespace ParallelUpload
     {
         private readonly ILogger _logger;
 
-        private BlockingCollection<string> _messages;
+        private BlockingCollection<ILogMessage> _messages;
 
         public LoggingClient(ILogger logger)
         {
             _logger = logger;
         }
 
-        public void SubscribeOn(BlockingCollection<string> messages)
+        public void SubscribeOn(BlockingCollection<ILogMessage> messages)
         {
             _messages = messages;
         }
@@ -30,7 +30,7 @@ namespace ParallelUpload
         {
             try
             {                
-                while (true) _logger.Debug(_messages.Take());
+                while (true) _logger.Log(_messages.Take());
             }
             catch (InvalidOperationException)
             {                

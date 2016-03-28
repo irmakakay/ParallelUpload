@@ -9,7 +9,7 @@ namespace ParallelUpload
 {
     public interface IFileServiceProxy
     {
-        void SubscibeOn(BlockingCollection<string> messages);
+        void SubscibeOn(BlockingCollection<ILogMessage> messages);
 
         void UploadFiles(IEnumerable<string> files);
     }
@@ -24,7 +24,7 @@ namespace ParallelUpload
 
         private HashSet<string> _existingFiles;
 
-        private BlockingCollection<string> _messages; 
+        private BlockingCollection<ILogMessage> _messages; 
 
         public FileServiceProxy(IFileService fileService, IParallelIterator iterator, IUploadConfiguration configuration)
         {
@@ -35,7 +35,7 @@ namespace ParallelUpload
 
         #region Implementation of IFileServiceProxy
 
-        public void SubscibeOn(BlockingCollection<string> messages)
+        public void SubscibeOn(BlockingCollection<ILogMessage> messages)
         {
             _messages = messages;
         }

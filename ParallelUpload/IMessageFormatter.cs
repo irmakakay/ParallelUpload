@@ -2,6 +2,6 @@
 {
     public interface IMessageFormatter
     {
-        string Format<T>(T message, params object[] @params);
+        ILogMessage Format<T>(T message, params object[] @params);
     }
 }

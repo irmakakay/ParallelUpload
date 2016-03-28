@@ -18,7 +18,7 @@ namespace ParallelUpload
         #region Implementation of IParallelIterator
 
         public Task ForEachAsync<T>(
-            BlockingCollection<string> messages,
+            BlockingCollection<ILogMessage> messages,
             IEnumerable<T> source, 
             int numberOfThreads, 
             Func<T, Task> iterate)

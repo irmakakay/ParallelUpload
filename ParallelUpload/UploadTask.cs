@@ -9,8 +9,8 @@ namespace ParallelUpload
         private readonly IUploadConfiguration _configuration;
         private readonly IFileServiceProxy _fileService;
         private readonly ILoggingClient _logger;
-        
-        private readonly BlockingCollection<string> _messages = new BlockingCollection<string>();
+
+        private readonly BlockingCollection<ILogMessage> _messages = new BlockingCollection<ILogMessage>();
 
         public UploadTask(IUploadConfiguration configuration, IFileServiceProxy fileService, ILoggingClient logger)
         {

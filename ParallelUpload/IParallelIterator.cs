@@ -8,7 +8,7 @@ namespace ParallelUpload
     public interface IParallelIterator
     {
         Task ForEachAsync<T>(
-            BlockingCollection<string> messages,
+            BlockingCollection<ILogMessage> messages,
             IEnumerable<T> source, 
             int numberOfThreads, 
             Func<T, Task> iterate);
