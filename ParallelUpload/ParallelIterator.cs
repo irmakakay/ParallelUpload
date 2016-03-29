@@ -30,8 +30,15 @@ namespace ParallelUpload
                     using (partition)
                         while (partition.MoveNext())
                         {
-                            await iterate(partition.Current);
-                            messages.Add(_formatter.Format(partition.Current));
+                            try
+                            {
+                                await iterate(partition.Current);
+                                messages.Add(_formatter.Format(partition.Current));
+                            }
+                            catch (Exception ex)
+                            {
+                                messages.Add(_formatter.Format(partition.Current, LogLevel.Error, ex));
+                            }  
                         }
                 }));
         }

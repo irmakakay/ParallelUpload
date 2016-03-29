@@ -7,12 +7,9 @@ namespace ParallelUpload
     {
         #region Implementation of IMessageFormatter
 
-        public ILogMessage Format<T>(T message, params object[] @params)
+        public ILogMessage Format<T>(T message, LogLevel level = LogLevel.Info, Exception ex = null)
         {
-            var ex = @params.OfType<Exception>().SingleOrDefault();
-            var level = @params.OfType<LogLevel>().SingleOrDefault();
-
-            return new LogMessage(message.ToString(), level, ex);
+            return new LogMessage(string.Format("Uploading {0}", message), level, ex);
         }
 
         #endregion
