@@ -46,7 +46,7 @@ namespace ParallelUpload
                 _messages, 
                 files, 
                 Environment.ProcessorCount, 
-                f => _fileService.Upload(f, _configuration.TargetFir))
+                f => _fileService.Upload(f, _configuration.TargetDir))
                 .Wait();   
             
             _messages.CompleteAdding();
@@ -57,7 +57,7 @@ namespace ParallelUpload
         private HashSet<string> ExistingFiles
         {
             get { return _existingFiles ?? 
-                (_existingFiles = new HashSet<string>(Directory.GetFiles(_configuration.TargetFir))); }
+                (_existingFiles = new HashSet<string>(Directory.GetFiles(_configuration.TargetDir))); }
         }
     }
 }

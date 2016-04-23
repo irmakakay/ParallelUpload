@@ -6,7 +6,7 @@
 
         public string SourceDir { get { return StringConstants.SourceDir; } }
 
-        public string TargetFir { get { return StringConstants.TargetDir; } }
+        public string TargetDir { get { return StringConstants.TargetDir; } }
 
         #endregion
     }

@@ -4,6 +4,6 @@
     {
         string SourceDir { get; }
 
-        string TargetFir { get; }
+        string TargetDir { get; }
     }
 }
